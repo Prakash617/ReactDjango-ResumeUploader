@@ -7,9 +7,11 @@ import axios from 'axios';
 
 
 import React from 'react';
-import { QueryClientProvider, QueryClient, useQuery, useQueryClient } from 'react-query';
+import { QueryClientProvider, QueryClient, useQuery, useQueryClient, useMutation } from 'react-query';
 import './App.css';
 import Table from './Components/Tables/Table';
+
+
 
 
 
@@ -18,10 +20,32 @@ function App() {
 
   const queryClient = useQueryClient()
 
-  const { data } = useQuery('todos', async () =>
+  const { data } = useQuery('getdata', async () =>
     await axios.get("http://127.0.0.1:8000/api/"))
 
-  console.log(data)
+  // console.log(data)
+
+ 
+
+  // const addData = (postdata:any)=>{
+  //   return axios.post("http://127.0.0.1:8000/api/",postdata)
+  // }
+
+  const mutation = useMutation(data => {
+    return axios.post('http://127.0.0.1:8000/api/', data)
+  })
+
+
+  const postData = (e:any)=>{
+
+    e.preventDefault()
+    console.log(`post ${e.data}`)
+
+    mutation.mutate(e.data)
+
+  }
+
+  
 
 
 
@@ -46,6 +70,9 @@ function App() {
   ];
 
   const [currency, setCurrency] = React.useState('Kathmandu');
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [value, setValue] = React.useState<Date | null>(null);
 
   const Input = styled('input')({
@@ -53,6 +80,7 @@ function App() {
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(`data:${event.target.value}`)
     setCurrency(event.target.value);
   };
 
@@ -64,10 +92,10 @@ function App() {
         </div>
         <div className='w-5/6 mx-auto flex flex-col md:flex-row mt-8' >
           <div className='md:w-1/2 w-full'>
-            <form action="/" method='post' className='space-y-8'>
+            <form action="/" method='post'onSubmit={postData} className='space-y-8'>
 
-              <TextField className='w-full' id="outlined-basic" label="First Name" variant="outlined" />
-              <TextField className='w-full' id="outlined-basic" label="email" type='email' variant="outlined" />
+              <TextField className='w-full' id="outlined-basic" label="First Name" value={name} onChange={(e)=>{setName(e.target.value)}} variant="outlined" />
+              <TextField className='w-full' id="outlined-basic" label="email" value={email} onChange={(e)=>{setEmail(e.target.value)}} type='email' variant="outlined" />
               <TextField
                 className='w-full'
                 id="filled-password-input"
@@ -75,6 +103,8 @@ function App() {
                 type="password"
                 autoComplete="current-password"
                 variant="outlined"
+                value={password}
+                onChange ={(e)=>{ setPassword(e.target.value)}}
               />
               <div>
                 <div className='text-left'>
@@ -151,7 +181,7 @@ function App() {
 
                 <div className='mt-6'>
 
-                  <Button variant="contained" className='w-3/5' type='submit' value="Submit" color="success">
+                  <Button variant="contained" className='w-3/5'  type='submit'  color="success">
                     Submit
                   </Button>
                 </div>
@@ -178,4 +208,5 @@ function App() {
 }
 
 export default App;
+
 
